@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Bepordy</title>
+    <style>
+        :root {
+            --bg: #060ce9;
+            --gold: #ffcc00;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        * {
+            box-sizing: inherit
+        }
+
+        html {
+            background: #020632
+        }
+
+        body {
+            margin: 0;
+            background: #020632;
+            color: #fff;
+            font-family: "Arial Narrow", Impact, sans-serif;
+            text-transform: uppercase
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--gold);
+            letter-spacing: .3em;
+            font-size: 2.4rem;
+            margin: .6rem 0 .2rem
+        }
+
+        .sub {
+            text-align: center;
+            margin: 0 0 .6rem;
+            opacity: .8;
+            letter-spacing: .15em
+        }
+
+        .bar {
+            display: flex;
+            gap: .6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: .6rem
+        }
+
+        .btn,
+        .bar button {
+            background: var(--gold);
+            color: #000;
+            border: 0;
+            padding: .6rem 1.3rem;
+            text-decoration: none;
+            font: bold 1rem "Arial Narrow", Impact, sans-serif;
+            text-transform: uppercase;
+            cursor: pointer
+        }
+
+        .btn:hover,
+        .bar button:hover {
+            background: #fff
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8px
+        }
+
+        .cat {
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 90px;
+            padding: 6px;
+            font-weight: bold;
+            font-size: 1.15rem
+        }
+
+        .tile {
+            background: var(--bg);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: min(14vh, 110px);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 2.6rem
+        }
+
+        .tile:hover {
+            background: #2230ff
+        }
+
+        .tile.used {
+            color: #1a2270;
+            background: #0a0f55
+        }
+
+        .clue {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2rem;
+            padding: 2rem;
+            text-align: center;
+            overflow: auto
+        }
+
+        .clue:target,
+        .clue:has(.a:target) {
+            display: flex;
+            animation: zoom .3s ease-out
+        }
+
+        @keyframes zoom {
+            from {
+                transform: scale(.3);
+                opacity: 0
+            }
+
+            to {
+                transform: none;
+                opacity: 1
+            }
+        }
+
+        .clue small {
+            color: var(--gold);
+            font-size: 1.3rem;
+            letter-spacing: .1em
+        }
+
+        .q {
+            font-size: 2.8rem;
+            margin: 0;
+            max-width: 900px
+        }
+
+        em {
+            font-style: normal;
+            opacity: .8;
+            font-size: 1.2rem
+        }
+
+        .a {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem
+        }
+
+        .a:target {
+            display: flex
+        }
+
+        .a p {
+            margin: 0;
+            font-size: 3.2rem;
+            color: var(--gold)
+        }
+
+        .a span {
+            font-size: 1.8rem
+        }
+
+        .clue:has(.a:target)>.btn,
+        .clue:has(.a:target)>em {
+            display: none
+        }
+
+        .rules {
+            max-width: 700px;
+            text-align: left;
+            text-transform: none;
+            font-size: 1.2rem;
+            line-height: 1.5
+        }
+
+        .rules h2 {
+            text-transform: uppercase;
+            color: var(--gold);
+            text-align: center
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bepordy</h1>
+    <p class="sub">Musikspecial</p>
+    <div class="bar">
+        <a class="btn" href="#regler">Regler</a>
+        <a class="btn" href="https://buzzin.live" target="_blank" rel="noopener">BuzzIn.live</a>
+        <button id="reset">Nollställ brädet</button>
+    </div>
+    <main id="board">
+        <div class="cat">One hit wonders</div>
+        <div class="cat">Spola tillbaka bandet</div>
+        <div class="cat">Svenska låtar</div>
+        <div class="cat">Musik i bion</div>
+        <div class="cat">Refräng på svenska</div>
+        <a class="tile" href="#c0_0">100</a>
+        <a class="tile" href="#c1_0">100</a>
+        <a class="tile" href="#c2_0">100</a>
+        <a class="tile" href="#c3_0">100</a>
+        <a class="tile" href="#c4_0">100</a>
+        <a class="tile" href="#c0_1">200</a>
+        <a class="tile" href="#c1_1">200</a>
+        <a class="tile" href="#c2_1">200</a>
+        <a class="tile" href="#c3_1">200</a>
+        <a class="tile" href="#c4_1">200</a>
+        <a class="tile" href="#c0_2">300</a>
+        <a class="tile" href="#c1_2">300</a>
+        <a class="tile" href="#c2_2">300</a>
+        <a class="tile" href="#c3_2">300</a>
+        <a class="tile" href="#c4_2">300</a>
+        <a class="tile" href="#c0_3">400</a>
+        <a class="tile" href="#c1_3">400</a>
+        <a class="tile" href="#c2_3">400</a>
+        <a class="tile" href="#c3_3">400</a>
+        <a class="tile" href="#c4_3">400</a>
+    </main>
+    <div class="clue" id="regler">
+        <div class="rules">
+            <h2>Så spelar vi</h2>
+            <p>De flesta frågorna går ut på att gissa låt och artist. Låten och artisten är värda hälften av frågans
+                poäng var, så på en 200-poängsfråga ger rätt låt 100 poäng och rätt artist 100 poäng.</p>
+            <p>Säger någon rätt låt men fel artist kan en annan spelare buzza in och svara på artisten, och kanske ta
+                poängen.</p>
+            <p>I "Spola tillbaka bandet" räcker det att säga låtnamnet. I "Musik i bion" gissar ni filmen.</p>
+            <p>Tryck på buzzern i BuzzIn.live för att svara!</p>
+        </div>
+        <a class="btn" href="#board">Stäng</a>
+    </div>
+    <div class="clue" id="c0_0"><small>One hit wonders · 100</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 50 p + artist 50 p</em><a class="btn"
+            href="#c0_0a">Visa svar</a>
+        <div class="a" id="c0_0a">
+            <p>Somebody That I Used to Know</p><span>Gotye</span><em>Låt 50 p + artist 50 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c1_0"><small>Spola tillbaka bandet · 100</small>
+        <p class="q">Vilken låt spelas baklänges? (bara låtnamn)</p><em>Hela poängen: 100 p</em><a class="btn"
+            href="#c1_0a">Visa svar</a>
+        <div class="a" id="c1_0a">
+            <p>Believer</p><span>Imagine Dragons</span><em>Hela poängen: 100 p</em><a class="btn" href="#board">Tillbaka
+                till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c2_0"><small>Svenska låtar · 100</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 50 p + artist 50 p</em><a class="btn"
+            href="#c2_0a">Visa svar</a>
+        <div class="a" id="c2_0a">
+            <p>Brinner i bröstet</p><span>Daniel Saucedo</span><em>Låt 50 p + artist 50 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c3_0"><small>Musik i bion · 100</small>
+        <p class="q">Vilken film kommer den här låten ifrån?</p><em>Hela poängen: 100 p</em><a class="btn"
+            href="#c3_0a">Visa svar</a>
+        <div class="a" id="c3_0a">
+            <p>Karlson på taket</p><span>Låt: Världens bästa Karlson</span><em>Hela poängen: 100 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c4_0"><small>Refräng på svenska · 100</small>
+        <p class="q">Läs upp refrängen på svenska. Vilken låt och artist?</p><em>Låt 50 p + artist 50 p</em><a
+            class="btn" href="#c4_0a">Visa svar</a>
+        <div class="a" id="c4_0a">
+            <p>Attention</p><span>Charlie Puth</span><em>Låt 50 p + artist 50 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c0_1"><small>One hit wonders · 200</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 100 p + artist 100 p</em><a class="btn"
+            href="#c0_1a">Visa svar</a>
+        <div class="a" id="c0_1a">
+            <p>A Thousand Miles</p><span>Vanessa Carlton</span><em>Låt 100 p + artist 100 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c1_1"><small>Spola tillbaka bandet · 200</small>
+        <p class="q">Vilken låt spelas baklänges? (bara låtnamn)</p><em>Hela poängen: 200 p</em><a class="btn"
+            href="#c1_1a">Visa svar</a>
+        <div class="a" id="c1_1a">
+            <p>Pumped Up Kicks</p><span>Foster the People</span><em>Hela poängen: 200 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c2_1"><small>Svenska låtar · 200</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 100 p + artist 100 p</em><a class="btn"
+            href="#c2_1a">Visa svar</a>
+        <div class="a" id="c2_1a">
+            <p>Utan dina andetag</p><span>Kent</span><em>Låt 100 p + artist 100 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c3_1"><small>Musik i bion · 200</small>
+        <p class="q">Vilken film kommer den här låten ifrån?</p><em>Hela poängen: 200 p</em><a class="btn"
+            href="#c3_1a">Visa svar</a>
+        <div class="a" id="c3_1a">
+            <p>Gladiator</p><span>Låt: Now We Are Free · Hans Zimmer</span><em>Hela poängen: 200 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c4_1"><small>Refräng på svenska · 200</small>
+        <p class="q">Läs upp refrängen på svenska. Vilken låt och artist?</p><em>Låt 100 p + artist 100 p</em><a
+            class="btn" href="#c4_1a">Visa svar</a>
+        <div class="a" id="c4_1a">
+            <p>Animals</p><span>Maroon 5</span><em>Låt 100 p + artist 100 p</em><a class="btn" href="#board">Tillbaka
+                till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c0_2"><small>One hit wonders · 300</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 150 p + artist 150 p</em><a class="btn"
+            href="#c0_2a">Visa svar</a>
+        <div class="a" id="c0_2a">
+            <p>Cheerleader</p><span>OMI</span><em>Låt 150 p + artist 150 p</em><a class="btn" href="#board">Tillbaka
+                till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c1_2"><small>Spola tillbaka bandet · 300</small>
+        <p class="q">Vilken låt spelas baklänges? (bara låtnamn)</p><em>Hela poängen: 300 p</em><a class="btn"
+            href="#c1_2a">Visa svar</a>
+        <div class="a" id="c1_2a">
+            <p>Sommarkatt</p><span>Lovet</span><em>Hela poängen: 300 p</em><a class="btn" href="#board">Tillbaka till
+                brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c2_2"><small>Svenska låtar · 300</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 150 p + artist 150 p</em><a class="btn"
+            href="#c2_2a">Visa svar</a>
+        <div class="a" id="c2_2a">
+            <p>Sista glas</p><span>Miriam Bryant</span><em>Låt 150 p + artist 150 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c3_2"><small>Musik i bion · 300</small>
+        <p class="q">Vilken film kommer den här låten ifrån?</p><em>Hela poängen: 300 p</em><a class="btn"
+            href="#c3_2a">Visa svar</a>
+        <div class="a" id="c3_2a">
+            <p>Sunes sommar</p><span>Låt: Sunes sommar · Thomas Lindahl</span><em>Hela poängen: 300 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c4_2"><small>Refräng på svenska · 300</small>
+        <p class="q">Läs upp refrängen på svenska. Vilken låt och artist?</p><em>Låt 150 p + artist 150 p</em><a
+            class="btn" href="#c4_2a">Visa svar</a>
+        <div class="a" id="c4_2a">
+            <p>Riptide</p><span>Vance Joy</span><em>Låt 150 p + artist 150 p</em><a class="btn" href="#board">Tillbaka
+                till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c0_3"><small>One hit wonders · 400</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 200 p + artist 200 p</em><a class="btn"
+            href="#c0_3a">Visa svar</a>
+        <div class="a" id="c0_3a">
+            <p>Mr. Saxobeat</p><span>Alexandra Stan</span><em>Låt 200 p + artist 200 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c1_3"><small>Spola tillbaka bandet · 400</small>
+        <p class="q">Vilken låt spelas baklänges? (bara låtnamn)</p><em>Hela poängen: 400 p</em><a class="btn"
+            href="#c1_3a">Visa svar</a>
+        <div class="a" id="c1_3a">
+            <p>...Baby One More Time</p><span>Britney Spears</span><em>Hela poängen: 400 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c2_3"><small>Svenska låtar · 400</small>
+        <p class="q">Vad är det för låt och artist/band?</p><em>Låt 200 p + artist 200 p</em><a class="btn"
+            href="#c2_3a">Visa svar</a>
+        <div class="a" id="c2_3a">
+            <p>Somliga går i trasiga skor</p><span>Cornelis Vreeswijk</span><em>Låt 200 p + artist 200 p</em><a
+                class="btn" href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c3_3"><small>Musik i bion · 400</small>
+        <p class="q">Vilken film kommer den här låten ifrån?</p><em>Hela poängen: 400 p</em><a class="btn"
+            href="#c3_3a">Visa svar</a>
+        <div class="a" id="c3_3a">
+            <p>Pride & Prejudice</p><span>Låt: Dawn · Dario Marianelli</span><em>Hela poängen: 400 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <div class="clue" id="c4_3"><small>Refräng på svenska · 400</small>
+        <p class="q">Läs upp refrängen på svenska. Vilken låt och artist?</p><em>Låt 200 p + artist 200 p</em><a
+            class="btn" href="#c4_3a">Visa svar</a>
+        <div class="a" id="c4_3a">
+            <p>Nothing Holding Me Back</p><span>Shawn Mendes</span><em>Låt 200 p + artist 200 p</em><a class="btn"
+                href="#board">Tillbaka till brädet</a>
+        </div>
+    </div>
+    <script>
+        const tiles = document.querySelectorAll(".tile");
+        tiles.forEach(t => t.addEventListener("click", () => t.classList.add("used")));
+        document.getElementById("reset").addEventListener("click", () => {
+            if (!confirm("Nollställa hela brädet?")) return;
+            tiles.forEach(t => t.classList.remove("used"));
+            location.hash = "board";
+        });
+    </script>
+</body>
+
+</html>
